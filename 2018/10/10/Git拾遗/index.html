@@ -33,7 +33,7 @@ Git是分布式，每个本地都保存一份文件与所有修改。
 <meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-index.png">
 <meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-index-2.png">
 <meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-index-3.png">
-<meta property="og:updated_time" content="2018-10-10T22:05:22.113Z">
+<meta property="og:updated_time" content="2018-10-10T22:09:40.974Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Git拾遗">
 <meta name="twitter:description" content="序言最近做项目的时候要把几个repo合在一个repo里，而且要保留所有的history，这才意识到自己只会最基本的Git操作，对Git的实现原理了解得不够。花了几小时学习了一下Git，并记录在此文中。
@@ -134,22 +134,25 @@ Git是分布式，每个本地都保存一份文件与所有修改。
 <h3 id="Git-内部实现"><a href="#Git-内部实现" class="headerlink" title="Git 内部实现"></a>Git 内部实现</h3><h4 id="Data-Model"><a href="#Data-Model" class="headerlink" title="Data Model"></a>Data Model</h4><ul>
 <li>blob：用来存储文件内容，每次改变一个文件就形成新的blob</li>
 <li>tree：解决了文件名-sha的对应问题，每个tree指向一系列blob和tree，可以把tree想成是一个directory</li>
-<li>commit：用于储存commit信息，指向具体的tree节点<br><img src="http://omcdckn46.bkt.clouddn.com/git-data-model.png" width="500px"></li>
+<li>commit：用于储存commit信息，指向具体的tree节点</li>
 </ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-data-model.png" width="500px"></p>
 <h4 id="Branching"><a href="#Branching" class="headerlink" title="Branching"></a>Branching</h4><ul>
-<li><p>每个branch在git实现里就是一个指向last commit的文件，因为从last commit开始按照方向只能有一个history<br><img src="http://omcdckn46.bkt.clouddn.com/git-branching.png" width="400px"></p>
+<li>每个branch在git实现里就是一个指向last commit的文件，因为从last commit开始按照方向只能有一个history</li>
+</ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-branching.png" width="400px"></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cat .git/refs/heads/master</div><div class="line">c641e4f0d19df0570667977edff860fed8f6c05a</div></pre></td></tr></table></figure>
-</li>
-<li><p><code>.git/HEAD</code>记录了当前分支的信息，不然git就不知道当前在什么branch了， HEAD其实是指向一个ref的文件<br><img src="http://omcdckn46.bkt.clouddn.com/git-head.png" width="600px"></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cat .git/HEAD</div><div class="line">ref: refs/heads/feature</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h4 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h4><ul>
-<li>index是个文件，里面记录了working directory/staging/repository的文件变化，当<code>git add</code>后，只是更新这些文件的变化<br><img src="http://omcdckn46.bkt.clouddn.com/git-states-change.png" width="500px"></li>
-</ul>
-<h5 id="实例讲解Index"><a href="#实例讲解Index" class="headerlink" title="实例讲解Index"></a>实例讲解Index</h5><ul>
-<li><p>当<code>git checkout feature</code>的时候，发生的事情：</p>
 <ul>
+<li><code>.git/HEAD</code>记录了当前分支的信息，不然git就不知道当前在什么branch了， HEAD其实是指向一个ref的文件</li>
+</ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-head.png" width="500px"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cat .git/HEAD</div><div class="line">ref: refs/heads/feature</div></pre></td></tr></table></figure>
+<h4 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h4><ul>
+<li>index是个文件，里面记录了working directory/staging/repository的文件变化，当<code>git add</code>后，只是更新这些文件的变化</li>
+</ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-states-change.png" width="500px"></p>
+<h5 id="实例讲解Index"><a href="#实例讲解Index" class="headerlink" title="实例讲解Index"></a>实例讲解Index</h5><ul>
+<li>当<code>git checkout feature</code>的时候，发生的事情：<ul>
 <li>HEAD移到feature</li>
 <li>把这个commit中包含的信息更新到index（index文件只存信息，不是存blob）<ul>
 <li>mtime：文件最后修改时间</li>
@@ -158,24 +161,29 @@ Git是分布式，每个本地都保存一份文件与所有修改。
 <li>repo：当前repo的文件版本</li>
 </ul>
 </li>
-<li>把working directory更新到这个commit所指向的文件内容<br><img src="http://omcdckn46.bkt.clouddn.com/git-index-cb.png" width="500px"></li>
+<li>把working directory更新到这个commit所指向的文件内容</li>
 </ul>
 </li>
-<li><p>当对<code>index.php</code>进行修改后，working dir中的文件mtime就发生了变化，此刻如果跑<code>git status</code>，wdir和mtime就发生了变化，这个命令会发现wdir和stage内容不同，就会告诉你这个文件进行了修改，但还没有stage<br><img src="http://omcdckn46.bkt.clouddn.com/git-index.png" width="500px"></p>
-</li>
 </ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-index-cb.png" width="500px"></p>
+<ul>
+<li>当对<code>index.php</code>进行修改后，working dir中的文件mtime就发生了变化，此刻如果跑<code>git status</code>，wdir和mtime就发生了变化，这个命令会发现wdir和stage内容不同，就会告诉你这个文件进行了修改，但还没有stage</li>
+</ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-index.png" width="500px"></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">On branch feature</div><div class="line">Changes not staged <span class="keyword">for</span> commit:</div><div class="line">  (use <span class="string">"git add &lt;file&gt;..."</span> to update what will be committed)</div><div class="line">  (use <span class="string">"git checkout -- &lt;file&gt;..."</span> to discard changes <span class="keyword">in</span> working directory)</div><div class="line">modified:   index.php</div><div class="line">no changes added to commit (use <span class="string">"git add"</span> and/or <span class="string">"git commit -a"</span>)</div></pre></td></tr></table></figure>
 <ul>
-<li><p>当<code>git add index.php</code>后，stage的值也会变成wdir的值，而且会为新文件创建blob文件<br><img src="http://omcdckn46.bkt.clouddn.com/git-index-2.png" width="500px"></p>
-</li>
-<li><p>当<code>git commit</code>后:</p>
+<li>当<code>git add index.php</code>后，stage的值也会变成wdir的值，而且会为新文件创建blob文件</li>
+</ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-index-2.png" width="500px"></p>
 <ul>
+<li>当<code>git commit</code>后:<ul>
 <li>会创建一个新的commit和tree object</li>
 <li>把feature指向新的commit</li>
-<li>index中repo的值也会更新<br><img src="http://omcdckn46.bkt.clouddn.com/git-index-3.png" width="500px"></li>
+<li>index中repo的值也会更新</li>
 </ul>
 </li>
 </ul>
+<p><img src="http://omcdckn46.bkt.clouddn.com/git-index-3.png" width="500px"></p>
 <h3 id="关于合并repo的解决方案"><a href="#关于合并repo的解决方案" class="headerlink" title="关于合并repo的解决方案"></a>关于合并repo的解决方案</h3><ul>
 <li><code>git filter-branch</code>用于对之前所有的记录进行修改，比如<code>git filter-branch --tree-filter &#39;rm -f passwords.txt&#39;</code> HEAD会对每一次提交都先删除一个文件；<code>git filter-branch --commit-filter ....</code> HEAD又会对所有的commit进行遍历然后做修改<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">git filter-branch --index-filter <span class="string">'</span></div><div class="line">        git ls-files -s |</div><div class="line">        sed "s,\t,&amp;'<span class="string">"<span class="variable">$dir</span>"</span><span class="string">'/," |</span></div><div class="line">        GIT_INDEX_FILE="$GIT_INDEX_FILE.new" git update-index --index-info &amp;&amp;</div><div class="line">        mv "$GIT_INDEX_FILE.new" "$GIT_INDEX_FILE"</div><div class="line">    ' HEAD</div></pre></td></tr></table></figure></li>
 </ul>
