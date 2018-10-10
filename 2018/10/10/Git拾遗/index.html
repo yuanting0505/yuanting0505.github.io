@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#">
+
+<head>
+  <meta charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <title>Git拾遗 | Jasmine Yuan&#39;s Home</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="###序言最近做项目的时候要把几个repo合在一个repo里，而且要保留所有的history，这才意识到自己只会最基本的Git操作，对Git的实现原理了解得不够。花了几小时学习了一下Git，并记录在此文中。
+###Git与其他版本控制系统的区别
+
+Git是分布式，每个本地都保存一份文件与所有修改。
+其他版本控制系统为中央集中式，中央保存所有修改，本地只有一份快照，如果要切换到其他version，需">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git拾遗">
+<meta property="og:url" content="jasmineyuan.com/2018/10/10/Git拾遗/index.html">
+<meta property="og:site_name" content="Jasmine Yuan's Home">
+<meta property="og:description" content="###序言最近做项目的时候要把几个repo合在一个repo里，而且要保留所有的history，这才意识到自己只会最基本的Git操作，对Git的实现原理了解得不够。花了几小时学习了一下Git，并记录在此文中。
+###Git与其他版本控制系统的区别
+
+Git是分布式，每个本地都保存一份文件与所有修改。
+其他版本控制系统为中央集中式，中央保存所有修改，本地只有一份快照，如果要切换到其他version，需">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-structure.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/vcs-structure.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-checkin.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/vcs-checkin.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/three-states.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/rebase-1.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/rebase-2.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-data-model.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-branching.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-head.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-states-change.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-checkout-1.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-checkout-2.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-checkout-3.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-index.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-index-2.png">
+<meta property="og:image" content="http://omcdckn46.bkt.clouddn.com/git-index-3.png">
+<meta property="og:updated_time" content="2018-10-10T21:23:38.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git拾遗">
+<meta name="twitter:description" content="###序言最近做项目的时候要把几个repo合在一个repo里，而且要保留所有的history，这才意识到自己只会最基本的Git操作，对Git的实现原理了解得不够。花了几小时学习了一下Git，并记录在此文中。
+###Git与其他版本控制系统的区别
+
+Git是分布式，每个本地都保存一份文件与所有修改。
+其他版本控制系统为中央集中式，中央保存所有修改，本地只有一份快照，如果要切换到其他version，需">
+<meta name="twitter:image" content="http://omcdckn46.bkt.clouddn.com/git-structure.png">
+  <!-- build:css css/screen.css -->
+
+  <link rel="stylesheet" href="/css/screen.css">
+  
+  <!-- endbuild -->
+  
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+  <meta name="generator" content="Jasmine Yuan's Home">
+  
+  
+  
+</head>
+
+
+<body class="post-template">
+
+  <header class="main-header post-head no-cover" >
+    <nav class="main-nav  clearfix">
+        
+        <a class="back-button icon-arrow-left" href="/">Home</a>
+        <a class="subscribe-button icon-feed" href="/atom.xml">Subscribe</a>
+    </nav>
+    
+    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">Scroll Down</span></a>
+</header>
+
+  
+
+<main id="content" class="content" role="main">
+  <article class="post" itemprop="blogPost" itemscope="itemscope" itemtype="http://schema.org/BlogPosting">
+    <header class="post-header">
+      <h1 class="post-title" itemprop="name">Git拾遗</h1>
+      <section class="post-meta">
+  <time datetime="2018-10-11T04:00:00.000Z" itemprop="datePublished" class="post-date">
+      2018-10-10
+  </time>
+  
+  
+  on 
+  <a href='/tags/programming/'>programming</a>,
+  
+  <a href='/tags/Git/'>Git</a>
+  
+  
+</section>
+
+    </header>
+    <section class="post-content" itemprop="description articleBody">
+      
+
+      
+      <p>###序言<br>最近做项目的时候要把几个repo合在一个repo里，而且要保留所有的history，这才意识到自己只会最基本的<code>Git</code>操作，对<code>Git</code>的实现原理了解得不够。花了几小时学习了一下<code>Git</code>，并记录在此文中。</p>
+<p>###Git与其他版本控制系统的区别</p>
+<ul>
+<li><code>Git</code>是分布式，每个本地都保存一份文件与所有修改。</li>
+<li>其他版本控制系统为中央集中式，中央保存所有修改，本地只有一份快照，如果要切换到其他version，需要与中央交互。</li>
+<li><code>SVN</code>追踪文件的变化，而<code>Git</code>的版本控制模型基于快照。比如说，一个<code>SVN</code>提交由仓库中原文件相比的差异（diff）组成。而<code>Git</code>在每次提交中记录文件的 完整内容。这让很多<code>Git</code>操作比<code>SVN</code>来的快得多，因为文件的某个版本不需要通过版本间的差异组装得到——每个文件完整的修改能立刻从<code>Git</code>的内部数据库中得到。</li>
+</ul>
+<p float="left" align="center"><br>    <img src="http://omcdckn46.bkt.clouddn.com/git-structure.png" width="300px"><br>    <img src="http://omcdckn46.bkt.clouddn.com/vcs-structure.png" width="300px"><br></p>
+
+<p float="left" align="center"><br>    <img src="http://omcdckn46.bkt.clouddn.com/git-checkin.png" width="300px"><br>    <img src="http://omcdckn46.bkt.clouddn.com/vcs-checkin.png" width="300px"><br></p>
+
+<p>###三个状态 Working Directory - Stage - Head</p>
+<ul>
+<li><code>Working Dir</code>: 本地工作目录</li>
+<li><code>Stage</code>: 缓存区（不然就只能都commit了）</li>
+<li><code>HEAD</code>: （一般）指向最新一次commit的引用</li>
+</ul>
+<p float="left" align="center"><br>    <img src="http://omcdckn46.bkt.clouddn.com/three-states.png" width="600px"><br></p>
+
+<h3 id="Git-一些命令"><a href="#Git-一些命令" class="headerlink" title="Git 一些命令"></a>Git 一些命令</h3><p>####<code>git init &lt;dir&gt;</code>与<code>git init —bare &lt;dir&gt;.git</code></p>
+<ul>
+<li><code>git init &lt;dir&gt;</code> 新建一个<code>dir</code>并<code>init</code>一个repo，<code>git clone</code>前不需要，会直接在当前目录<code>init</code></li>
+<li><code>git init —bare &lt;dir&gt;.git</code> 新建一个<code>bare repo</code>，<strong>不含</strong> working tree，一般用于中央服务器上（想想remote确实是.git结尾的）</li>
+<li>如果本地<code>git init —bare a.git</code>了，就可以<code>git clone a.git</code>到别的目录，对文件进行修改，然后<code>git push</code>到<code>a.git</code>里</li>
+<li>不能直接在<code>bare repo</code>里修改文件（一般你也找不到），本地repo用来commit，remote的用来push</li>
+</ul>
+<p>####<code>git revert</code> / <code>git reset</code> / <code>git clean</code></p>
+<ul>
+<li><p><code>git revert &lt;commit&gt;</code> 回滚<strong>某一次</strong>commit，<em>提交一个新的commit</em>来取消这次的修改，会多一个commit，而且会留在记录里，比如发现一个bug是某一次commit引起的，来revert这次commit来修复这个bug，也适用于push到remote</p>
+</li>
+<li><p><code>git reset &lt;commit&gt;</code>: 回滚到某一个commit，同时回滚n个commit，但会保留本地的修改。当使用<code>git reset —hard &lt;commit&gt;</code>时，会删除本地的修改到那个commit时的状态，如果不指定commit，则为最近一次提交</p>
+</li>
+<li><code>git reset &lt;file&gt;</code>: 把一个添加到缓存区的文件恢复到未缓存区，修改仍然保留; <code>git reset</code>所有文件放回未缓存区</li>
+<li><code>git clean</code>：清理没有追踪的文件。<code>git reset —hard HEAD</code>会清理本地目录，把追踪文件的修改给reset，但新增加的文件依旧在，这时需要<code>git clean -f</code>来取消这些文件的添加 <code>-df</code>则为目录和文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git reset --hard HEAD</div><div class="line">git clean -df  // 新添加的目录和文件</div><div class="line"><span class="comment"># 让本地工作目录回到上一次commit的状态</span></div></pre></td></tr></table></figure>
+<p>####<code>git commit —amend</code></p>
+<ul>
+<li>将缓存区的修改和最新的一次commit合并成一个新的commit，替换了最新的commit</li>
+<li><code>git commit --amend --no-edit</code> 不修改上次commit的信息</li>
+</ul>
+<p>####<code>git rebase &lt;basebranch&gt;</code></p>
+<ul>
+<li>rebase就是说把base分支改成别的分支，也就是说本分支上做的改动在那个新的base上重做一次</li>
+<li><a href="https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA" target="_blank" rel="external">https://git-scm.com/book/zh/v2/Git-%E5%88%86%E6%94%AF-%E5%8F%98%E5%9F%BA</a> 讲得很好<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git checkout experiment</div><div class="line">git rebase master</div><div class="line"><span class="comment"># master作为base，共同父亲c2到自己做的修改在master上重做一遍，做完还是在experiment上哟</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p float="left" align="center"><br>    <img src="http://omcdckn46.bkt.clouddn.com/rebase-1.png" width="300px"><br>    <img src="http://omcdckn46.bkt.clouddn.com/rebase-2.png" width="300px"><br></p>
+
+<p>###Git 内部实现</p>
+<h4 id="Data-Model"><a href="#Data-Model" class="headerlink" title="Data Model"></a>Data Model</h4><ul>
+<li>blob：用来存储文件内容，每次改变一个文件就形成新的blob</li>
+<li>tree：解决了文件名-sha的对应问题，每个tree指向一系列blob和tree，可以把tree想成是一个directory</li>
+<li>commit：用于储存commit信息，指向具体的tree节点<p float="left" align="center"><br>  <img src="http://omcdckn46.bkt.clouddn.com/git-data-model.png" width="600px"><br></p>
+
+</li>
+</ul>
+<h4 id="Branching"><a href="#Branching" class="headerlink" title="Branching"></a>Branching</h4><ul>
+<li><p>每个branch在git实现里就是一个指向last commit的文件，因为从last commit开始按照方向只能有一个history<br></p><p float="left" align="center"><br>  <img src="http://omcdckn46.bkt.clouddn.com/git-branching.png" width="500px"><br></p><p></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cat .git/refs/heads/master</div><div class="line">c641e4f0d19df0570667977edff860fed8f6c05a</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>.git/HEAD</code>记录了当前分支的信息，不然git就不知道当前在什么branch了， HEAD其实是指向一个ref的文件<br></p><p float="left" align="center"><br>  <img src="http://omcdckn46.bkt.clouddn.com/git-head.png" width="600px"><br></p><p></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cat .git/HEAD</div><div class="line">ref: refs/heads/feature</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="Index"><a href="#Index" class="headerlink" title="Index"></a>Index</h4><ul>
+<li>index是个文件，里面记录了working directory/staging/repository的文件变化，当<code>git add</code>后，只是更新这些文件的变化<p float="left" align="center"><br>  <img src="http://omcdckn46.bkt.clouddn.com/git-states-change.png" width="600px"><br></p>
+
+</li>
+</ul>
+<p>#####实例讲解Index</p>
+<ul>
+<li><p>当<code>git checkout feature</code>的时候，发生的事情：</p>
+<ul>
+<li>HEAD移到feature</li>
+<li>把这个commit中包含的信息更新到index（index文件只存信息，不是存blob）<ul>
+<li>mtime：文件最后修改时间</li>
+<li>wdir：当前working directory的文件版本</li>
+<li>stage：当前staging上的文件版本</li>
+<li>repo：当前repo的文件版本</li>
+</ul>
+</li>
+<li>把working directory更新到这个commit所指向的文件内容<p float="left" align="center"><br><img src="http://omcdckn46.bkt.clouddn.com/git-checkout-1.png" width="200px"><br><img src="http://omcdckn46.bkt.clouddn.com/git-checkout-2.png" width="400px"><br></p><br><p float="left" align="center"><br><img src="http://omcdckn46.bkt.clouddn.com/git-checkout-3.png" width="600px"><br></p>
+</li>
+</ul>
+</li>
+<li><p>当对<code>index.php</code>进行修改后，working dir中的文件mtime就发生了变化，此刻如果跑<code>git status</code>，wdir和mtime就发生了变化，这个命令会发现wdir和stage内容不同，就会告诉你这个文件进行了修改，但还没有stage<br></p><p float="left" align="center"><br>  <img src="http://omcdckn46.bkt.clouddn.com/git-index.png" width="600px"><br></p><p></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">On branch feature</div><div class="line">Changes not staged <span class="keyword">for</span> commit:</div><div class="line">  (use <span class="string">"git add &lt;file&gt;..."</span> to update what will be committed)</div><div class="line">  (use <span class="string">"git checkout -- &lt;file&gt;..."</span> to discard changes <span class="keyword">in</span> working directory)</div><div class="line">modified:   index.php</div><div class="line">no changes added to commit (use <span class="string">"git add"</span> and/or <span class="string">"git commit -a"</span>)</div></pre></td></tr></table></figure>
+</li>
+<li><p>当<code>git add index.php</code>后，stage的值也会变成wdir的值，而且会为新文件创建blob文件</p>
+<p float="left" align="center"><br>  <img src="http://omcdckn46.bkt.clouddn.com/git-index-2.png" width="600px"><br></p>
+</li>
+<li><p>当<code>git commit</code>后:</p>
+<ul>
+<li>会创建一个新的commit和tree object</li>
+<li>把feature指向新的commit</li>
+<li>index中repo的值也会更新<p float="left" align="center"><br><img src="http://omcdckn46.bkt.clouddn.com/git-index-3.png" width="600px"><br></p>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="关于合并repo的解决方案"><a href="#关于合并repo的解决方案" class="headerlink" title="关于合并repo的解决方案"></a>关于合并repo的解决方案</h3><ul>
+<li><code>git filter-branch</code>用于对之前所有的记录进行修改，比如<code>git filter-branch --tree-filter &#39;rm -f passwords.txt&#39;</code> HEAD会对每一次提交都先删除一个文件；<code>git filter-branch --commit-filter ....</code> HEAD又会对所有的commit进行遍历然后做修改<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">git filter-branch --index-filter <span class="string">'</span></div><div class="line">        git ls-files -s |</div><div class="line">        sed "s,\t,&amp;'<span class="string">"<span class="variable">$dir</span>"</span><span class="string">'/," |</span></div><div class="line">        GIT_INDEX_FILE="$GIT_INDEX_FILE.new" git update-index --index-info &amp;&amp;</div><div class="line">        mv "$GIT_INDEX_FILE.new" "$GIT_INDEX_FILE"</div><div class="line">    ' HEAD</div></pre></td></tr></table></figure></li>
+</ul>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Jasmine Yuan</h4>
+    <p>A JavaScript Developer, A Cat Owner</p>
+    
+    <div class="author-meta">
+      <span class="author-location icon-location">Vancouver, Canada</span>
+      <span class="author-link icon-link"><a href="jasmineyuan.com">jasmineyuan.com</a></span>
+    
+      <section>
+        
+          <a href="https://twitter.com/YtJasmine" class="author-social">twitter</a>
+        
+          <a href="https://plus.google.com/u/1/108040574954055567249" class="author-social">google+</a>
+        
+          <a href="https://github.com/yuanting0505" class="author-social">github</a>
+        
+      </section>
+    </div>
+</section>
+
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=jasmineyuan.com/2018/10/10/Git拾遗/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=jasmineyuan.com/2018/10/10/Git拾遗/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=jasmineyuan.com/2018/10/10/Git拾遗/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+  
+  <span class="page-number">•</span>
+  
+  <a class="older-posts" href="/2018/01/08/有一只猫叫狗蛋/" title="有一只猫叫狗蛋">
+      Older Post →
+  </a>
+  
+</nav>
+
+  
+<div id="comment" class="comments-area">
+    <h2 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h2>
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+  <footer class="site-footer clearfix">
+ <section class="copyright"><a href="/">Jasmine Yuan's Home</a> &copy; 2015 &bull; All rights reserved.</section>
+ <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/"> Hexo</a></section>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/jquery-2.0.3.min.js"><\/script>')</script>
+
+<script type="text/javascript" src="/js/index.js"></script>
+
+
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'jasmineyuan';
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+</body>
+</html>
