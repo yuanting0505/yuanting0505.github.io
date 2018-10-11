@@ -39,7 +39,9 @@
                 contentWidth = $(".post-content").outerWidth(), // Width of the content
                 imageWidth = this.naturalWidth; // Original image resolution
 
-            if (imageWidth >= contentWidth) {
+            var imageNonFull = $this.hasClass('non-full');
+
+            if (imageWidth >= contentWidth && !imageNonFull) {
                 $this.addClass('full-img');
             } else {
                 $this.removeClass('full-img');
